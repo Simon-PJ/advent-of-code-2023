@@ -42,4 +42,21 @@ let isValidGame (game: Game) =
 
 let validGames = games |> List.filter isValidGame
 
+let countInSet (colour: string) (set: Set) = 
+    let colour = List.tryFind (fun x -> x.colour = colour) set
+    match colour with
+    | Some x -> x.count
+    | None -> 0
+
+let minOfColour (game: Game) (colour: string) =
+    List.map (countInSet colour) game.sets |> List.max
+
+let power (game: Game) =
+    let minRed = minOfColour game "red"
+    let minGreen = minOfColour game "green"
+    let minBlue = minOfColour game "blue"
+    minRed * minGreen * minBlue
+
+let sumPowers = List.map power games |> List.sum
+
 let idCountOfValidGames = List.map (fun x -> x.id) validGames |> List.sum
