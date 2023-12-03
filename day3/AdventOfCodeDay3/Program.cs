@@ -1,46 +1,74 @@
 ﻿var input = File.ReadAllLines("input.txt");
 
-var sumOfPartNumbers = 0;
+var sumOfGearRatios = 0;
 
 for (var j = 0; j < input.Length; j++)
 {
-    var number = "";
-    var isPartNumber = false;
     for (var i = 0; i < input[0].Length; i++)
     {
-        if (char.IsDigit(input[j][i]))
+        if (input[j][i] == '*')
         {
-            number += input[j][i];
+            var gearNumbers = new List<int>();
 
-            if (!isPartNumber)
+            if (char.IsDigit(input[j][i - 1]))
             {
-                for (var i2 = -1; i2 <= 1; i2++)
+                var gearNumber = string.Join("", input[j].Take(i).Reverse().TakeWhile(char.IsAsciiDigit).Reverse());
+                gearNumbers.Add(int.Parse(gearNumber));
+            }
+            if (char.IsDigit(input[j][i + 1]))
+            {
+                var gearNumber = string.Join("", input[j].Skip(i + 1).TakeWhile(char.IsDigit));
+                gearNumbers.Add(int.Parse(gearNumber));
+            }
+
+            for (var j2 = -1; j2 <= 1; j2 += 2)
+            {
+                var number = "";
+                var isGearNumber = false;
+
+                for (var i2 = 0; i2 < input[0].Length; i2++)
                 {
-                    for (var j2 = -1; j2 <= 1; j2++)
+                    var j2Offset = j + j2;
+
+                    if (j2Offset < 0 && j2Offset >= input.Length)
                     {
-                        var offseti = i + i2;
-                        var offsetj = j + j2;
-                        if (offseti >= 0 && offseti < input[0].Length && offsetj >= 0 && offsetj < input.Length && input[offsetj][offseti] != '.' && !char.IsDigit(input[offsetj][offseti]))
+                        continue;
+                    }
+
+                    if (char.IsDigit(input[j2Offset][i2]))
+                    {
+                        number += input[j2Offset][i2];
+
+                        if (Math.Abs(i2 - i) <= 1)
                         {
-                            isPartNumber = true;
+                            isGearNumber = true;
                         }
+                    }
+
+                    if (!char.IsDigit(input[j2Offset][i2]) || i2 + 1 == input[0].Length)
+                    {
+                        if (isGearNumber)
+                        {
+                            gearNumbers.Add(int.Parse(number));
+                        }
+
+                        number = "";
+                        isGearNumber = false;
                     }
                 }
             }
-        }
-        
-        if (!char.IsDigit(input[j][i]) || i + 1 == input[0].Length)
-        {
-            if (isPartNumber)
-            {
-                sumOfPartNumbers += int.Parse(number);
-            }
 
-            number = "";
-            isPartNumber = false;
+            if (gearNumbers.Count > 1)
+            {
+                if (gearNumbers.Contains(17))
+                {
+
+                }
+                sumOfGearRatios += gearNumbers.Aggregate((a, b) => a * b);
+            }
         }
     }
 }
 
-Console.WriteLine(sumOfPartNumbers);
+Console.WriteLine(sumOfGearRatios);
 Console.ReadKey();
