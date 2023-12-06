@@ -1,6 +1,12 @@
 ﻿var input = File.ReadAllLines("input.txt");
 
-var seeds = input[0].Split(":")[1].Split(" ", StringSplitOptions.RemoveEmptyEntries).Select(long.Parse).ToArray();
+var seedInfo = input[0].Split(":")[1].Split(" ", StringSplitOptions.RemoveEmptyEntries).Select(long.Parse).ToArray();
+
+var seeds = new List<Seed>();
+for (var i = 0; i < seedInfo.Length; i+=2)
+{
+    seeds.Add(new Seed(seedInfo[i], seedInfo[i+1]));
+}
 
 var maps = new List<List<Map>>();
 var currentMaps = new List<Map>();
@@ -21,24 +27,35 @@ for (var i = 1; i < input.Length; i++)
     }
 }
 maps.Add(currentMaps);
+maps.Reverse();
 
-var locations = seeds.Select(seed =>
+long location = 0;
+bool foundMinLocation = false;
+
+while (!foundMinLocation)
 {
+    location++;
+
+    var mappedValue = location;
+
     foreach (var map in maps)
     {
-        var matchingMap = map.SingleOrDefault(x => seed >= x.SourceStart && seed <= x.SourceStart + x.Range - 1);
+        var matchingMap = map.SingleOrDefault(x => mappedValue >= x.DestStart && mappedValue <= x.DestStart + x.Range - 1);
 
         if (matchingMap != null)
         {
-            seed = matchingMap.DestStart + seed - matchingMap.SourceStart;
+            mappedValue = matchingMap.SourceStart + mappedValue - matchingMap.DestStart;
         }
     }
 
-    return seed;
-}).ToArray();
-
-var lowestLocation = locations.Min();
+    if (seeds.Any(seed => mappedValue >= seed.Start && mappedValue < seed.Start + seed.Range))
+    {
+        foundMinLocation = true;
+    }
+}
 
 Console.ReadKey();
 
 record Map(long DestStart, long SourceStart, long Range);
+
+record Seed(long Start, long Range);
