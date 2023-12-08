@@ -9,7 +9,7 @@ let numberOfMatchingCards (card: char) (hand: string)=
 
 let xOfAKind (hand: string) (x: int) = 
     let maxOfAKind = Seq.map (fun x -> numberOfMatchingCards x hand) hand |> Seq.max
-    maxOfAKind = 4
+    maxOfAKind = x
 
 let fiveOfAKind (hand: string) =
     xOfAKind hand 5
@@ -38,10 +38,6 @@ let twoPair (hand: string) =
 let onePair (hand: string) =
     xPairs hand 1
 
-let highCard (hand: string) =
-    let pictureMap = Map.empty.Add('T', 10).Add('J', 11).Add('Q', 12).Add('K', 13).Add('A', 14)
-    Seq.map (fun x -> if pictureMap.ContainsKey(x) then pictureMap[x] else int (x.ToString())) hand |> Seq.max
-
 let calculateScore (hand: string) =
     if fiveOfAKind hand then
         700
@@ -56,7 +52,7 @@ let calculateScore (hand: string) =
     elif onePair hand then
         200
     else
-        highCard hand
+        100
     
 let parseHandBidAndScore (line: string) =
     let parts = line.Split(" ")
@@ -70,6 +66,6 @@ let alphabettyHand (hand: string) =
 
 let handsBidsAndScores = List.map parseHandBidAndScore input
 
-let sortedHandsBidsAndScores = Seq.sortBy (fun x -> x.score, (alphabettyHand x.hand)) handsBidsAndScores
+let sortedHandsBidsAndScores = List.sortByDescending (fun x -> x.score, (alphabettyHand x.hand)) handsBidsAndScores |> List.rev
 
-let totalWinnings = Seq.mapi (fun i x -> (i + 1) * x.bid) sortedHandsBidsAndScores |> Seq.sum
+let totalWinnings = List.mapi (fun i x -> (i + 1) * x.bid) sortedHandsBidsAndScores |> Seq.sum
