@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-var input = File.ReadAllLines("input.txt");
+﻿var input = File.ReadAllLines("input.txt");
 
 var instructions = input[0];
 
@@ -19,24 +17,50 @@ for (var i = 2; i < input.Length; i++)
 }
 
 var steps = 0;
-var currentNode = "AAA";
-var destinationNode = "ZZZ";
+var startingNodes = network.Keys.Where(key => key.Last() == 'A').ToList();
+var currentNodes = startingNodes;
 var currentInstructions = instructions;
+var endedInZ = new long[currentNodes.Count];
 
-while (currentNode != destinationNode)
+while (currentNodes.Any(node => node != ""))
 {
     var instruction = currentInstructions[0];
     currentInstructions = currentInstructions.Substring(1);
 
-    currentNode = instruction == 'L' ? network[currentNode].Left : network[currentNode].Right;
+    currentNodes = currentNodes.Select(node => node == "" ? "" : instruction == 'L' ? network[node].Left : network[node].Right).ToList();
+
     steps++;
-    
+
+    for (var i = 0; i < currentNodes.Count; i++)
+    {
+        if (currentNodes[i].EndsWith('Z'))
+        {
+            endedInZ[i] = steps;
+            currentNodes[i] = "";
+        }
+    }
+
     if (currentInstructions == string.Empty)
     {
         currentInstructions = instructions;
     }
 }
 
+var answer = LCM(endedInZ);
+
 Console.ReadKey();
+
+static long LCM(params long[] numbers)
+{
+    return numbers.Aggregate(lcmOfTwo);
+}
+static long lcmOfTwo(long a, long b)
+{
+    return Math.Abs(a * b) / GCD(a, b);
+}
+static long GCD(long a, long b)
+{
+    return b == 0 ? a : GCD(b, a % b);
+}
 
 record Path(string Left, string Right);
