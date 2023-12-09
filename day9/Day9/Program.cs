@@ -15,11 +15,11 @@ int GetNextInLine(List<int> line)
 
     if (nextLine.All(x => x == 0))
     {
-        return line.Last();
+        return line.First();
     }
     else
     {
-        return line.Last() + GetNextInLine(nextLine);
+        return line.First() - GetNextInLine(nextLine);
     }
 }
 
