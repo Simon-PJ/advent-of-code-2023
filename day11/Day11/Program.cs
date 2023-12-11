@@ -2,22 +2,20 @@
 
 const char Space = '.';
 const char Galaxy = '#';
+const int ExpansionFactor = 2;
 
 var input = File.ReadLines("input.txt").ToArray();
 
-var tempInput = new List<string>();
+var emptyRows = new List<int>();
+var emptyColumns = new List<int>();
 
 for (var j = 0; j < input.Length; j++)
 {
-    tempInput.Add(input[j]);
-
     if (input[j].All(x => x == Space))
     {
-        tempInput.Add(string.Join("", Enumerable.Repeat(Space, input[j].Length)));
+        emptyRows.Add(j);
     }
 }
-
-input = tempInput.ToArray();
 
 for (var i = input[0].Length - 1; i >= 0; i--)
 {
@@ -34,10 +32,7 @@ for (var i = input[0].Length - 1; i >= 0; i--)
 
     if (allSpace)
     {
-        for (var j = 0; j < input.Length; j++)
-        {
-            input[j] = input[j].Substring(0, i) + Space + input[j].Substring(i);
-        }
+        emptyColumns.Add(i);
     }
 }
 
@@ -60,7 +55,28 @@ int CalculateSumOfPaths(List<Point> galaxies)
     var firstGalaxy = galaxies.First();
     var restOfGalaxies = galaxies.Skip(1).ToList();
 
-    var sumOfPaths = restOfGalaxies.Sum(galaxy => Math.Abs(galaxy.X - firstGalaxy.X) + Math.Abs(galaxy.Y - firstGalaxy.Y));
+    var sumOfPaths = restOfGalaxies.Sum(galaxy => {
+        int expansionXMultiplier = 0;
+        int expansionYMultiplier = 0;
+
+        for (var i = Math.Min(galaxy.X, firstGalaxy.X); i <= Math.Max(galaxy.X, galaxy.X); i++)
+        {
+            if (emptyColumns.Contains(i)) expansionXMultiplier++;
+        }
+
+        for (var j = Math.Min(galaxy.Y, firstGalaxy.Y); j <= Math.Max(galaxy.Y, galaxy.Y); j++)
+        {
+            if (emptyRows.Contains(j)) expansionYMultiplier++;
+        }
+
+        return
+            Math.Abs(galaxy.X - firstGalaxy.X) + Math.Abs(galaxy.Y - firstGalaxy.Y)
+             + (expansionXMultiplier * ExpansionFactor)
+             + (expansionYMultiplier * ExpansionFactor)
+             - expansionXMultiplier
+             - expansionYMultiplier;
+    });
+
     var restOfSumOfPaths = CalculateSumOfPaths(restOfGalaxies);
 
     return sumOfPaths + restOfSumOfPaths;
