@@ -2,7 +2,7 @@
 
 const char Space = '.';
 const char Galaxy = '#';
-const int ExpansionFactor = 2;
+const int ExpansionFactor = 1000000;
 
 var input = File.ReadLines("input.txt").ToArray();
 
@@ -49,22 +49,22 @@ for (var i = 0; i < input[0].Length; i++)
     }
 }
 
-int CalculateSumOfPaths(List<Point> galaxies)
+long CalculateSumOfPaths(List<Point> galaxies)
 {
     if (galaxies.Count == 1) return 0;
     var firstGalaxy = galaxies.First();
     var restOfGalaxies = galaxies.Skip(1).ToList();
 
     var sumOfPaths = restOfGalaxies.Sum(galaxy => {
-        int expansionXMultiplier = 0;
-        int expansionYMultiplier = 0;
+        long expansionXMultiplier = 0;
+        long expansionYMultiplier = 0;
 
-        for (var i = Math.Min(galaxy.X, firstGalaxy.X); i <= Math.Max(galaxy.X, galaxy.X); i++)
+        for (var i = Math.Min(galaxy.X, firstGalaxy.X); i <= Math.Max(galaxy.X, firstGalaxy.X); i++)
         {
             if (emptyColumns.Contains(i)) expansionXMultiplier++;
         }
 
-        for (var j = Math.Min(galaxy.Y, firstGalaxy.Y); j <= Math.Max(galaxy.Y, galaxy.Y); j++)
+        for (var j = Math.Min(galaxy.Y, firstGalaxy.Y); j <= Math.Max(galaxy.Y, firstGalaxy.Y); j++)
         {
             if (emptyRows.Contains(j)) expansionYMultiplier++;
         }
