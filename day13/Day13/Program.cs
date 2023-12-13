@@ -1,4 +1,6 @@
-﻿var input = File.ReadAllLines("input.txt");
+﻿using System.Reflection.Metadata;
+
+var input = File.ReadAllLines("input.txt");
 
 var patterns = new List<string[]>();
 
@@ -22,20 +24,17 @@ int GetVerticalReflection(string[] pattern)
     {
         var eachSide = Math.Min(i, pattern[0].Length - i);
 
-        var reflected = true;
+        var differences = 0;
 
         for (var j = 0; j < pattern.Length; j++)
         {
             var left = pattern[j].Substring(i - eachSide, eachSide);
             var right = pattern[j].Substring(i, eachSide);
 
-            if (left != string.Join("", right.Reverse()))
-            {
-                reflected = false;
-            }
+            differences += Differences(left, string.Join("", right.Reverse()));
         }
 
-        if (reflected)
+        if (differences == 1)
         {
             return i;
         }
@@ -50,30 +49,35 @@ int GetHorizontalReflection(string[] pattern)
     {
         var eachSide = Math.Min(j, pattern.Length - j);
 
-        var reflected = true;
+        var differences = 0;
 
-        var one = "";
-        var two = "";
         for (var i = 0; i < pattern[0].Length; i++)
         {
             var above = string.Join("", Enumerable.Range(j - eachSide, eachSide).Select(y => pattern[y][i]));
             var below = string.Join("", Enumerable.Range(j, eachSide).Select(y => pattern[y][i]));
 
-            one += above;
-            two += below;
-            if (above != string.Join("", below.Reverse()))
-            {
-                reflected = false;
-            }
+            differences += Differences(above, string.Join("", below.Reverse()));
         }
 
-        if (reflected)
+        if (differences == 1)
         {
             return j;
         }
     }
 
     return 0;
+}
+
+int Differences(string a, string b)
+{
+    int differences = 0;
+
+    for (var i = 0; i < a.Length; i++)
+    {
+        if (a[i] != b[i]) differences++;
+    }
+
+    return differences;
 }
 
 int answer = 0;
