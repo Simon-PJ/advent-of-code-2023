@@ -29,7 +29,7 @@ for (var i = 1; i < input.Length; i++)
 maps.Add(currentMaps);
 maps.Reverse();
 
-long location = 0;
+long location = 600000000;
 bool foundMinLocation = false;
 
 while (!foundMinLocation)
